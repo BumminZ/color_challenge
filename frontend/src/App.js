@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useState } from "react";
+import "./App.css";
+import Body from "./component/body";
+import Header from "./component/header";
 
-function App() {
+const App = () => {
+  const [color, setColor] = useState("");
+  const [hsl, setHsl] = useState({});
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .get("http://localhost:4000/colors", {
+        params: {
+          code: color.startsWith("#") ? color : `#${color}`,
+        },
+        headers: {
+          "Access-Control-Allow-Origin": "http://127.0.0.1:3000",
+        },
+      })
+      .then(
+        (response) => {
+          setHsl(response.data.data);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    // setHsl(fetchHSL(color));
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header color={color} setColor={setColor} handleSubmit={handleSubmit} />
+      <Body data={hsl} />
     </div>
   );
-}
+};
 
 export default App;
